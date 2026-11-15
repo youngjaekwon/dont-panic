@@ -1,0 +1,48 @@
+[project]
+name = "coupon"
+version = "0.1.0"
+description = "선착순 쿠폰 발급 서비스 (gRPC + Redis + PostgreSQL)"
+authors = [
+    { name = "youngjaekwon" }
+]
+requires-python = ">=3.14"
+dependencies = [
+    "alembic>=1.20.1",
+    "asyncpg>=0.32.0",
+    "dishka>=1.10.1",
+    "googleapis-common-protos>=1.76.0",
+    "grpcio>=1.85.1",
+    "protobuf>=7.36.2",
+    "pydantic-settings>=2.16.3",
+    "redis[hiredis]>=8.1.0",
+    "sqlalchemy[asyncio]>=2.1.8",
+]
+
+
+[dependency-groups]
+dev = [
+    "import-linter>=2.16",
+    "pytest>=9.2.0",
+    "pytest-asyncio>=1.5.0",
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+pythonpath = [".", "../../gen/python"]
+
+[tool.ruff]
+line-length = 120
+
+[tool.importlinter]
+root_package = "app"
+
+[[tool.importlinter.contracts]]
+name = "layers import only downward (main -> di -> api -> services -> repositories -> models -> core)"
+type = "layers"
+layers = ["app.main", "app.di", "app.api", "app.services", "app.repositories", "app.models", "app.core"]
+
+[tool.pyright]
+venvPath = "."
+venv = ".venv"
+extraPaths = ["../../gen/python"]
