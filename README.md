@@ -42,11 +42,8 @@ make breaking   # main 브랜치 대비 호환성 검사
 
 ## 서비스 테스트
 
-각 서비스 폴더의 README를 따른다. Python 서비스는 다음과 같다.
+모든 서비스가 같은 명령을 제공한다. 테스트에 필요한 DB 같은 의존성은 `test`가 직접 띄운다. CI도 같은 명령을 쓴다.
 
 ```sh
-cd services/<서비스>
-cp .env.example .env
-docker compose up -d --wait
-uv sync && uv run pytest
+make -C services/<서비스> lint test
 ```

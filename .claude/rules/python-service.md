@@ -28,13 +28,3 @@ paths:
 ## 마이그레이션
 
 - 스키마 변경은 alembic 마이그레이션을 새로 만든다. 이미 커밋된 마이그레이션은 고치지 않는다.
-
-## 검증
-
-서비스 폴더에서 실행한다.
-
-```sh
-docker compose up -d --wait
-uv run pytest
-uv run lint-imports
-```

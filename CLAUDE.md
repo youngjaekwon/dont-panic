@@ -52,8 +52,12 @@ docs/adr/            저장소 수준 결정 기록
 ```sh
 make proto                      # buf lint → gen 생성 → descriptor 빌드
 make breaking                   # main 대비 proto 호환성 검사
-cd services/<서비스> && docker compose up -d --wait && uv run pytest && uv run lint-imports
+make -C services/<서비스> lint test
 ```
+
+- 모든 서비스는 폴더의 `Makefile`에 `lint`와 `test` 타깃을 둔다.
+  - `test`는 테스트에 필요한 의존성(DB, 브로커 등)을 직접 띄우고 테스트를 돌린다.
+  - CI는 서비스 내용을 모른 채 이 두 타깃과 `Dockerfile` 빌드만 호출한다. 서비스를 추가해도 CI 파일은 고치지 않는다.
 
 ## Git
 
