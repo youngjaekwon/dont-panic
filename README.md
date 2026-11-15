@@ -1,6 +1,17 @@
-# 플랫폼 모노레포
+# dont-panic
 
-한 제품의 도메인 서비스들을 담는 MSA 저장소. 서비스는 gRPC만 열고, 외부 HTTP/JSON은 Envoy Gateway가 gRPC로 변환한다. 규칙과 방향은 [CLAUDE.md](CLAUDE.md)에 있다.
+백엔드 개발자가 해 봐야 할 (거의) 모든 것을 직접 해 보는 저장소.
+
+한 제품의 도메인 서비스들을 MSA 모노레포로 담는다. 서비스는 gRPC만 열고, 외부 HTTP/JSON은 Envoy Gateway가 gRPC로 변환한다. 규칙과 방향은 [CLAUDE.md](CLAUDE.md)에, 결정의 이유는 [docs/adr/](docs/adr)에 있다.
+
+## 사전 요구사항
+
+| 도구 | 용도 |
+|---|---|
+| Docker | PG·Redis 컨테이너, buf 실행, 이미지 빌드 |
+| [uv](https://docs.astral.sh/uv/) | Python 서비스 의존성과 실행 |
+| make | `make proto`, `make breaking` |
+| jq | Claude Code 포맷 hook (`.claude/settings.json`) |
 
 ## 서비스
 

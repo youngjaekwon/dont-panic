@@ -1,4 +1,4 @@
-# 플랫폼 모노레포
+# dont-panic
 
 한 제품을 이루는 도메인 서비스들을 담는 MSA 저장소다. 서비스는 gRPC만 열고, 외부 HTTP/JSON은 Envoy Gateway가 gRPC로 변환한다. 스택과 구조를 이렇게 정한 이유는 `docs/adr/`에 있다.
 
