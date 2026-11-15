@@ -52,8 +52,12 @@ docs/adr/            저장소 수준 결정 기록
 ```sh
 make proto                      # buf lint → gen 생성 → descriptor 빌드
 make breaking                   # main 대비 proto 호환성 검사
-cd services/<서비스> && docker compose up -d --wait && uv run pytest && uv run lint-imports
+make -C services/<서비스> lint test
 ```
+
+- 모든 서비스는 폴더의 `Makefile`에 `lint`와 `test` 타깃을 둔다.
+  - `test`는 테스트에 필요한 의존성(DB, 브로커 등)을 직접 띄우고 테스트를 돌린다.
+  - CI는 서비스 내용을 모른 채 이 두 타깃과 `Dockerfile` 빌드만 호출한다. 서비스를 추가해도 CI 파일은 고치지 않는다.
 
 ## Git
 
@@ -65,6 +69,7 @@ cd services/<서비스> && docker compose up -d --wait && uv run pytest && uv ru
     - `release/<버전>`: `develop`에서 만들어 `main`과 `develop`으로 합친다.
     - `hotfix/<이름>`: `main`에서 만들어 `main`과 `develop`으로 합친다.
   - `main`과 `develop`에 직접 커밋하지 않는다.
+  - 머지는 GitHub PR로만 한다. 두 브랜치 모두 보호되어 있고, CI(`.github/workflows/ci.yml`)를 통과해야 한다. 머지 방식은 merge commit이다.
 - 커밋 메시지는 Conventional Commits 형식이다: `<type>(<scope>): <요약>`.
   - type: `feat`, `fix`, `refactor`, `perf`, `test`, `docs`, `build`, `ci`, `chore`
   - scope: 서비스 이름, `proto`, `infra`. 저장소 전체에 걸친 변경이면 생략한다.

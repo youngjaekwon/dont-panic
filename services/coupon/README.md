@@ -5,11 +5,8 @@ gRPC 서비스(50051). 외부 HTTP/JSON은 gateway가 transcoding한다. 저장�
 ## 실행
 
 ```sh
-cp .env.example .env                                # 접속 정보 (환경 변수가 있으면 그쪽이 우선)
-docker compose up -d --wait                         # PG, Redis
-uv sync
-uv run pytest                                       # 정합성 테스트
-uv run lint-imports                                 # 레이어 규칙
+make lint                                           # 포맷, 레이어 규칙
+make test                                           # .env가 없으면 .env.example로 만들고, PG·Redis를 띄운 뒤 정합성 테스트
 PYTHONPATH=../../gen/python uv run python -m app.main   # 로컬 실행 (먼저 alembic upgrade head)
 ```
 

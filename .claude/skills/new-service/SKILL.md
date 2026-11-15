@@ -33,5 +33,5 @@ disable-model-invocation: true
    - `README.md`에는 실행법과 API를 쓴다.
    - 루트 `README.md`의 서비스 표에 한 줄 추가한다.
 8. **검증**
-   - 서비스 폴더에서 `uv run pytest`와 `uv run lint-imports`를 통과시킨다.
+   - `make -C services/<name> lint test`를 통과시킨다. 의존성이 쿠폰과 다르면 `Makefile`의 `test` 타깃을 고친다. CI 파일은 고치지 않는다.
    - 새 인프라 구성 요소가 필요했다면 ADR을 먼저 쓴다.

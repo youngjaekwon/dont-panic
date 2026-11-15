@@ -1,0 +1,100 @@
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main, develop]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  proto:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - run: make proto
+      - name: gen is up to date
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            git status --porcelain
+            echo "gen/ is out of date with proto/: run make proto and commit the result"
+            exit 1
+          fi
+      - name: breaking against latest release
+        run: |
+          tag=$(git describe --tags --abbrev=0 origin/main 2>/dev/null || true)
+          if [ -z "$tag" ]; then
+            echo "no release tag on main yet: breaking check skipped"
+            exit 0
+          fi
+          make breaking AGAINST=".git#tag=$tag"
+
+  detect:
+    runs-on: ubuntu-latest
+    outputs:
+      services: ${{ steps.list.outputs.services }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - id: list
+        env:
+          EVENT: ${{ github.event_name }}
+          BASE_REF: ${{ github.base_ref }}
+        run: |
+          all=1
+          if [ "$EVENT" = "pull_request" ]; then
+            changed=$(git diff --name-only "origin/$BASE_REF...HEAD")
+            echo "$changed" | grep -qE '^(gen/|\.github/workflows/)' || all=
+          fi
+          services=$(for d in services/*/; do
+            s=$(basename "$d")
+            if [ -n "$all" ] || echo "$changed" | grep -q "^services/$s/"; then echo "$s"; fi
+          done | jq -Rc . | jq -sc .)
+          echo "services=$services" >> "$GITHUB_OUTPUT"
+          echo "services to check: $services"
+
+  service:
+    needs: detect
+    if: needs.detect.outputs.services != '[]'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        service: ${{ fromJSON(needs.detect.outputs.services) }}
+    defaults:
+      run:
+        working-directory: services/${{ matrix.service }}
+    env:
+      UV_LOCKED: "1"
+    steps:
+      - uses: actions/checkout@v7
+      - if: hashFiles(format('services/{0}/pyproject.toml', matrix.service)) != ''
+        uses: astral-sh/setup-uv@v10.3.3
+        with:
+          working-directory: services/${{ matrix.service }}
+      - run: make lint
+      - run: make test
+      - if: hashFiles(format('services/{0}/Dockerfile', matrix.service)) != ''
+        working-directory: .
+        run: docker build -f services/${{ matrix.service }}/Dockerfile .
+
+  ci-ok:
+    if: always()
+    needs: [proto, detect, service]
+    runs-on: ubuntu-latest
+    steps:
+      - env:
+          FAILED: ${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}
+        run: |
+          if [ "$FAILED" = "true" ]; then
+            echo "a required job failed or was cancelled"
+            exit 1
+          fi
