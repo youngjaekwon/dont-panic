@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "deny": [
+      "Read(/gen/**)",
+      "Edit(/gen/**)",
+      "Edit(**/uv.lock)",
+      "Edit(/buf.lock)",
+      "Read(**/.env)",
+      "Bash(git push --force *)",
+      "Bash(git push -f *)",
+      "Bash(git reset --hard *)",
+      "Bash(docker compose down -v *)",
+      "Bash(docker compose down --volumes *)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "f=$(jq -r '.tool_input.file_path // empty'); case \"$f\" in *.py) uvx ruff@0.17.3 format -q \"$f\" ;; esac; exit 0"
+          }
+        ]
+      }
+    ]
+  }
+}
