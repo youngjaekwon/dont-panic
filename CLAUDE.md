@@ -65,6 +65,7 @@ cd services/<서비스> && docker compose up -d --wait && uv run pytest && uv ru
     - `release/<버전>`: `develop`에서 만들어 `main`과 `develop`으로 합친다.
     - `hotfix/<이름>`: `main`에서 만들어 `main`과 `develop`으로 합친다.
   - `main`과 `develop`에 직접 커밋하지 않는다.
+  - 머지는 GitHub PR로만 한다. 두 브랜치 모두 보호되어 있고, CI(`.github/workflows/ci.yml`)를 통과해야 한다. 머지 방식은 merge commit이다.
 - 커밋 메시지는 Conventional Commits 형식이다: `<type>(<scope>): <요약>`.
   - type: `feat`, `fix`, `refactor`, `perf`, `test`, `docs`, `build`, `ci`, `chore`
   - scope: 서비스 이름, `proto`, `infra`. 저장소 전체에 걸친 변경이면 생략한다.
