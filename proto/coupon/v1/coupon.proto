@@ -1,0 +1,60 @@
+syntax = "proto3";
+
+package coupon.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+
+service CouponService {
+  rpc CreateCampaign(CreateCampaignRequest) returns (Campaign);
+
+  rpc GetCampaign(GetCampaignRequest) returns (Campaign);
+
+  rpc ListCoupons(ListCouponsRequest) returns (ListCouponsResponse);
+
+  rpc IssueCoupon(IssueCouponRequest) returns (IssueCouponResponse) {
+    option (google.api.http) = {post: "/v1/campaigns/{campaign_id}/coupons"};
+  }
+}
+
+message CreateCampaignRequest {
+  string name = 1;
+  int32 total_quantity = 2;
+  google.protobuf.Timestamp starts_at = 3;
+}
+
+message GetCampaignRequest {
+  int64 campaign_id = 1;
+}
+
+message ListCouponsRequest {
+  int64 campaign_id = 1;
+  int32 page_size = 2;
+  string page_token = 3;
+}
+
+message ListCouponsResponse {
+  repeated Coupon coupons = 1;
+  string next_page_token = 2;
+}
+
+message IssueCouponRequest {
+  int64 campaign_id = 1;
+}
+
+message IssueCouponResponse {
+  string code = 1;
+}
+
+message Coupon {
+  string code = 1;
+  google.protobuf.Timestamp issued_at = 2;
+}
+
+message Campaign {
+  int64 id = 1;
+  string name = 2;
+  int32 total_quantity = 3;
+  int32 issued_count = 4;
+  google.protobuf.Timestamp starts_at = 5;
+}

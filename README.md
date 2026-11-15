@@ -6,7 +6,7 @@
 
 | 서비스 | 설명 | 계약 |
 |---|---|---|
-| 아직 없음 | | |
+| [coupon](services/coupon) | 선착순 쿠폰 발급 | `proto/coupon/v1` |
 
 ## 로드맵
 
